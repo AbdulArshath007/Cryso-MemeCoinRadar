@@ -30,6 +30,18 @@ const GLOBAL_CSS = `
   }
   @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    display: none;
+  }
+  .sidebar-overlay-open {
+    display: block !important;
+  }
+
   /* Mobile Responsive Overrides */
   @media (max-width: 768px) {
     .sidebar-container {
@@ -43,17 +55,6 @@ const GLOBAL_CSS = `
     }
     .sidebar-open {
       transform: translateX(0) !important;
-    }
-    .sidebar-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(4px);
-      z-index: 999;
-      display: none;
-    }
-    .sidebar-overlay-open {
-      display: block !important;
     }
     .main-stats-row {
       flex-wrap: wrap !important;
