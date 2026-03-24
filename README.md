@@ -21,6 +21,10 @@
 - [✨ Problem Statement](#-problem-statement)
 - [🎯 Requirements & Expected Outcome](#-requirements--expected-outcome)
 - [🌟 Key Features](#-key-features)
+- [📝 Project Summary](#-project-summary)
+- [📂 File Architecture](#-file-architecture)
+- [🤖 AI Implementation](#-ai-implementation)
+- [🔄 Project Workflow](#-project-workflow)
 - [📊 Pitch Deck (PowerPoint)](#-pitch-deck-powerpoint)
 - [🌍 Working Model](#-working-model)
 - [🏗️ System Architecture](#-system-architecture)
@@ -58,6 +62,51 @@ Building a system that analyzes social media trends and predicts the potential g
 - **🚨 Hype Alerts & Radar:** Dashboard components light up vividly when a coin shifts into "Breakout" or "Crash Risk" phases.
 - [🤖 Built-in AI Chatbot](#-built-in-ai-chatbot)
 - **💾 Historical Data Layer:** Automatically inserts snapshots of global market emotion directly into NeonDB every 60 seconds.
+
+---
+
+## 📝 Project Summary
+**CRYSO** (Crypto Social Intelligence) is a cutting-edge real-time dashboard designed for the **Devthon 1.0 Hackathon**. It solves the problem of "Meme Coin Volatility" by shifting the focus from lagging price charts to leading social signals. By aggregating raw streams from **Telegram MTProto** and **Reddit HTTP** APIs, CRYSO identifies momentum spikes precisely as they happen in global crypto communities, providing a "Social Velocity Score" that predicts breakouts before they hit the major exchanges.
+
+---
+
+## 📂 File Architecture
+The project follows a clean, decoupled **Monorepo structure** for maximum scalability and deployment efficiency:
+
+```text
+CRYSO/
+├── BACKEND/                  # Node.js + Express Server
+│   ├── auth.js               # NeonDB & JWT Authentication logic
+│   ├── dbStorage.js          # Background Data-Persistence Worker
+│   ├── redditService.js      # Reddit API Scraper
+│   ├── telegramService.js    # Telegram MTProto Headless Client
+│   ├── socialAggregator.js   # The Brain: Data Merge & Ranking
+│   └── server.js             # API Entry Point
+├── frontend/                 # React.js Dashboard
+│   ├── public/               # Static Assets
+│   └── src/                  # App Logic & Component UI
+│       ├── components/       # Custom Glassmorphism UI Components
+│       └── App.js            # Main Dashboard Orchestrator
+└── README.md                 # Project Documentation
+```
+
+---
+
+## 🤖 AI Implementation
+The intelligence of CRYSO is amplified by a locally-hosted LLM integration (**Gemma 3:1b via Ollama**) or a smart fallback pattern matching engine.
+- **Conversational Intelligence:** Users can interact with the live market data via the "Crypto Assistant" chatbot.
+- **Smart Query Parsing:** The assistant uses advanced regex and sentiment weighting to distinguish between a simple greeting and a deep market query (e.g., "Tell me the crash risk of PEPE").
+- **Real-Time Data Injection:** When a query is made, the assistant pulls the latest scores from the `social_stats` table to provide data-backed answers rather than generic AI responses.
+
+---
+
+## 🔄 Project Workflow
+The CRYSO engine operates on a continuous 4-stage lifecycle to ensure zero-latency intelligence:
+
+1.  **Ingestion Phase:** The `telegramService` and `redditService` maintain active connections to high-velocity crypto channels, harvesting thousands of raw text messages per minute.
+2.  **Analysis Phase:** The `socialAggregator.js` parses strings for ticker mentions, calculates "Velocity" (Recent 5-min weighted vs. 60-min base), and determines a Sentiment Label (GREED, NEUTRAL, FEAR).
+3.  **Persistence Phase:** The `dbStorage` worker snapshots the entire market state every 60 seconds, writing it to **NeonDB** for historical trend-line rendering.
+4.  **Visualization Phase:** The **React.js Frontend** polls the `/api/social/stats` endpoint every 5 seconds, instantly updating the Live Dashboard, Recharts (Line/Bar/Pie), and the AI Assistant's knowledge base.
 
 ---
 
