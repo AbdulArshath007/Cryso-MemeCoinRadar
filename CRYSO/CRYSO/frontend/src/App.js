@@ -47,9 +47,12 @@ const GLOBAL_CSS = `
     .sidebar-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0,0,0,0.4);
       backdrop-filter: blur(4px);
       z-index: 999;
+      display: none;
+    }
+    .sidebar-overlay-open {
       display: block !important;
     }
     .main-stats-row {
@@ -80,8 +83,8 @@ const GLOBAL_CSS = `
   }
 `;
 
-const GLASS = { background: "rgba(255,255,255,.055)", backdropFilter: "blur(32px)", border: "1px solid rgba(255,255,255,.14)", borderRadius: 14, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,.25)" };
-const GLASS_SIDEBAR = { background: "rgba(6,8,18,.52)", backdropFilter: "blur(40px)" };
+const GLASS = { background: "rgba(255,255,255,.055)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,.14)", borderRadius: 14, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,.25)" };
+const GLASS_SIDEBAR = { background: "rgba(6,8,18,.52)", backdropFilter: "blur(20px)" };
 const PHASE_STYLE = { "BREAKOUT": { bg:`rgba(255, 0, 144, .1)`, color:PRIMARY_COLOR }, "ACCUMULATION": { bg:`rgba(255, 0, 144, .08)`, color:PRIMARY_COLOR }, "FADING": { bg:`rgba(255, 0, 144, .08)`, color:PRIMARY_COLOR }, "CRASH RISK": { bg:`rgba(255, 0, 144, .1)`, color:PRIMARY_COLOR }, "EMERGING": { bg:`rgba(255, 0, 144, .1)`, color:PRIMARY_COLOR } };
 
 const COINS_FALLBACK = [
@@ -482,8 +485,7 @@ function Dashboard({ user, onLogout }) {
         
         {/* Mobile Sidebar Overlay */}
         <div 
-          className="sidebar-overlay" 
-          style={{display:"none"}} 
+          className={`sidebar-overlay ${isSidebarOpen ? 'sidebar-overlay-open' : ''}`}
           onClick={() => setIsSidebarOpen(false)}
         />
 
