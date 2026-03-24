@@ -33,6 +33,8 @@
 - [🧠 How It Works](#-how-it-works)
 - [📡 API Reference](#-api-reference)
 - [📸 Screenshots](#-screenshots)
+- [🏆 What Makes CRYSO Stand Out](#-what-makes-cryso-stand-out)
+- [📄 License](#-license)
 
 ---
 
@@ -268,4 +270,23 @@ Returns the blended momentum scores calculating Fear & Greed across the ecosyste
 ### Embedded Live Bot Intelligence
 <div align="center">
   <img src="docs/images/doge_response_1774295961854.png" alt="Smart AI Bot answering queries" width="800">
+</div>
+
+---
+
+## 🏆 What Makes CRYSO Stand Out
+Unlike traditional crypto dashboards that rely purely on trailing price charts, **CRYSO structurally predicts future volume**.
+- **100% Social Indexing:** Pulling thousands of organic discussions across Reddit and Telegram directly into our scoring matrix in absolute real-time.
+- **Glassmorphism Meets Speed:** A breathtaking web experience powered by deep React component architecture and ultra-fast Node.js event polling.
+- **Cloud-Native Automation:** Completely automated container deployment on Render seamlessly integrated with a highly robust serverless NeonDB PostgreSQL database.
+
+---
+
+## 📄 License
+This architecture is licensed under the MIT License - designed and explicitly built for the **Devthon 2.0 Hackathon**.
+
+<br />
+
+<div align="center">
+  <b>Built with ❤️ using React, Node.js, Express, NeonDB, and a lot of ☕</b>
 </div>
