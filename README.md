@@ -283,7 +283,7 @@ Unlike traditional crypto dashboards that rely purely on trailing price charts, 
 ---
 
 ## 📄 License
-This architecture is licensed under the MIT License - designed and explicitly built for the **Devthon 2.0 Hackathon**.
+This architecture is licensed under the MIT License - designed and explicitly built for the **Devthon 1.0 Hackathon**.
 
 <br />
 
