@@ -29,6 +29,55 @@ const GLOBAL_CSS = `
     100% { opacity: 1; transform: translateY(0) scale(1); }
   }
   @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+
+  /* Mobile Responsive Overrides */
+  @media (max-width: 768px) {
+    .sidebar-container {
+      position: fixed !important;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+    .sidebar-open {
+      transform: translateX(0) !important;
+    }
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      z-index: 999;
+      display: block !important;
+    }
+    .main-stats-row {
+      flex-wrap: wrap !important;
+      gap: 16px !important;
+    }
+    .stat-card-divider {
+      display: none !important;
+    }
+    .dashboard-grid {
+      grid-template-columns: 1fr !important;
+    }
+    .header-stats {
+      display: none !important;
+    }
+    .login-box {
+      width: 90% !important;
+      padding: 24px !important;
+    }
+    .desktop-hide {
+      display: flex !important;
+    }
+  }
+  @media (min-width: 769px) {
+    .desktop-hide {
+      display: none !important;
+    }
+  }
 `;
 
 const GLASS = { background: "rgba(255,255,255,.055)", backdropFilter: "blur(32px)", border: "1px solid rgba(255,255,255,.14)", borderRadius: 14, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,.25)" };
@@ -173,7 +222,7 @@ function LoginPage({ onLogin }) {
 
   return (
     <div style={{position:"fixed",inset:0,zIndex:999,display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div style={{...GLASS,width:420,padding:40,zIndex:1,animation:"slideIn .5s ease"}}>
+      <div className="login-box" style={{...GLASS,width:420,padding:40,zIndex:1,animation:"slideIn .5s ease"}}>
         <div style={mulish({fontSize:28,color:PRIMARY_COLOR,marginBottom:8,fontWeight:700,textAlign:"center"})}>Cryso</div>
         <div style={mulish({fontSize:13,color:"rgba(255,255,255,.5)",marginBottom:30,textAlign:"center"})}>Crypto Intelligence Dashboard</div>
         
@@ -281,6 +330,7 @@ function Dashboard({ user, onLogout }) {
   const [toastIdx, setToastIdx] = useState(0);
   const [toastVis, setToastVis] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [messages, setMessages] = useState([{type:"bot",text:"Hi! I'm your AI assistant. Ask me anything!"}]);
   const [chatInput, setChatInput] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -430,7 +480,16 @@ function Dashboard({ user, onLogout }) {
     <>
       <div style={{position:"relative",zIndex:1,display:"flex",height:"100vh",color:"#e2eaf5"}}>
         
-        <aside style={{...GLASS_SIDEBAR,width:240,minWidth:240,display:"flex",flexDirection:"column",borderRight:`1px solid ${PRIMARY_COLOR}1f`}}>
+        {/* Mobile Sidebar Overlay */}
+        <div 
+          className="sidebar-overlay" 
+          style={{display:"none"}} 
+          onClick={() => setIsSidebarOpen(false)}
+        />
+
+        <aside 
+          className={`sidebar-container ${isSidebarOpen ? 'sidebar-open' : ''}`}
+          style={{...GLASS_SIDEBAR,width:240,minWidth:240,display:"flex",flexDirection:"column",borderRight:`1px solid ${PRIMARY_COLOR}1f`}}>
           <div style={{padding:"18px 15px 14px",borderBottom:`1px solid ${PRIMARY_COLOR}19`,display:"flex",alignItems:"center",gap:10}}>
             <div style={{width:32,height:32,borderRadius:8,background:PRIMARY_COLOR,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,color:"#fff",fontWeight:"bold"}}>C</div>
             <div>
@@ -458,6 +517,25 @@ function Dashboard({ user, onLogout }) {
         <div style={{flex:1,display:"flex",flexDirection:"column",overflow:"hidden"}}>
           <header style={{...GLASS_SIDEBAR,borderBottom:`1px solid ${PRIMARY_COLOR}19`,padding:"12px 22px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
             <div style={{display:"flex",alignItems:"center",gap:12}}>
+              {/* Hamburger Menu */}
+              <button 
+                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+                style={{
+                  background: "none",
+                  border: "none",
+                  color: PRIMARY_COLOR,
+                  fontSize: 20,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                  marginRight: 4
+                }}
+                className="desktop-hide"
+              >
+                {isSidebarOpen ? "✕" : "☰"}
+              </button>
               <div style={mulish({fontSize:18,color:"#fff",fontWeight:600})}>Command Center</div>
               {isLive ? (
                 <div style={{display:"flex",alignItems:"center",gap:6,background:"rgba(0, 255, 144, 0.1)",padding:"4px 10px",borderRadius:20,border:"1px solid rgba(0, 255, 144, 0.3)"}}>
@@ -471,7 +549,7 @@ function Dashboard({ user, onLogout }) {
                 </div>
               )}
             </div>
-            <div style={{display:"flex",gap:24}}>
+            <div style={{display:"flex",gap:24}} className="header-stats">
               {[{label:"Posts/Min",val:stats.postsPerMinute.toLocaleString()},{label:"Alerts",val:alerts.length.toString()},{label:"Mood",val:stats.sentimentLabel}].map(s => (
                 <div key={s.label} style={{display:"flex",flexDirection:"column",alignItems:"flex-end",gap:2}}>
                   <span style={mono({fontSize:7,color:"rgba(255,255,255,.2)",letterSpacing:"1.5px",textTransform:"uppercase"})}>{s.label}</span>
@@ -482,7 +560,7 @@ function Dashboard({ user, onLogout }) {
           </header>
 
           <div style={{flex:1,overflowY:"auto",padding:"18px 22px"}}>
-            <div style={{display:"flex",gap:28,marginBottom:18,paddingBottom:14,borderBottom:"1px solid rgba(255,255,255,.06)"}}>
+            <div className="main-stats-row" style={{display:"flex",gap:28,marginBottom:18,paddingBottom:14,borderBottom:"1px solid rgba(255,255,255,.06)"}}>
               {[{label:"Sentiment",val:stats.sentimentLabel,sub:`${stats.sentiment}/100`},{label:"Posts/Hour",val:isLive ? stats.postsPerHour.toLocaleString() : "50.4K",sub:"Live Total"},{label:"Breakouts",val:stats.breakouts.toString(),sub:`Total Active`},{label:"Crash Risk",val:stats.crashRisks.toString(),sub:stats.crashRisks > 0 ? "High" : "Low"}].map((s,i) => (
                 <div key={s.label} style={{display:"flex",alignItems:"center",gap:28}}>
                   <div style={{display:"flex",flexDirection:"column",gap:4}}>
@@ -490,13 +568,13 @@ function Dashboard({ user, onLogout }) {
                     <span style={mulish({fontSize:26,color:PRIMARY_COLOR,fontWeight:700})}>{s.val}</span>
                     <span style={mono({fontSize:9,color:"rgba(255,255,255,.4)"})}>{s.sub}</span>
                   </div>
-                  {i<3 && <div style={{width:1,background:"rgba(255,255,255,.07)",height:60}}/>}
+                  {i<3 && <div className="stat-card-divider" style={{width:1,background:"rgba(255,255,255,.07)",height:60}}/>}
                 </div>
               ))}
             </div>
 
             {activeNav === "Dashboard" && (
-              <div style={{display:"grid",gridTemplateColumns:"1.7fr 1fr",gap:16}}>
+              <div className="dashboard-grid" style={{display:"grid",gridTemplateColumns:"1.7fr 1fr",gap:16}}>
                 <div>
                   <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
                     <span style={{color:PRIMARY_COLOR,fontSize:8}}>●</span>
@@ -680,7 +758,7 @@ function Dashboard({ user, onLogout }) {
 
       <div style={{position:"fixed",bottom:20,right:20,zIndex:50}}>
         {chatOpen && (
-          <div style={{...GLASS,width:320,height:420,borderRadius:14,display:"flex",flexDirection:"column",marginBottom:12, animation:"chatPopup 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards"}}>
+          <div style={{...GLASS,width:320,maxWidth:"90%",height:420,borderRadius:14,display:"flex",flexDirection:"column",marginBottom:12, animation:"chatPopup 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards"}}>
             <div style={{padding:14,borderBottom:`1px solid ${PRIMARY_COLOR}19`,display:"flex",justifyContent:"space-between"}}>
               <div style={mulish({fontSize:14,color:"#fff",fontWeight:600})}>Crypto Assistant</div>
               <button onClick={() => setChatOpen(false)} style={{background:"none",border:"none",color:PRIMARY_COLOR,fontSize:16,cursor:"pointer"}}>×</button>
