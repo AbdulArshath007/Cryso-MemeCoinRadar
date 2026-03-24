@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Dither from "./components/Dither/Dither";
-import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, AreaChart, Area, YAxis, BarChart, Bar, XAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
 
 const REACT_ENV_URL = process.env.REACT_APP_API_URL;
 const BASE_URL = REACT_ENV_URL ? (REACT_ENV_URL.endsWith('/') ? REACT_ENV_URL.slice(0, -1) : REACT_ENV_URL) : 'http://localhost:5000';
@@ -272,6 +272,12 @@ function Dashboard({ user, onLogout }) {
   });
 
   const [platCounts, setPlatCounts] = useState([72,36,17]);
+  const [lineData, setLineData] = useState(
+    Array.from({length: 20}).map((_, i) => ({
+      time: new Date(Date.now() - (20-i)*5000).toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'}),
+      score: 60 + Math.random()*15
+    }))
+  );
   const [toastIdx, setToastIdx] = useState(0);
   const [toastVis, setToastVis] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
@@ -305,6 +311,11 @@ function Dashboard({ user, onLogout }) {
               sentimentLabel: data.sentimentLabel,
               breakouts: data.breakouts,
               crashRisks: data.crashRisks
+            });
+            setLineData(prev => {
+              const now = new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+              const updated = [...prev, { time: now, score: data.sentiment }];
+              return updated.length > 20 ? updated.slice(updated.length - 20) : updated;
             });
           } else {
             setCoins(COINS_FALLBACK); // Fallback if backend connected but Telegram not authorized
@@ -561,37 +572,49 @@ function Dashboard({ user, onLogout }) {
             {activeNav === "Deep-Dive" && (
               <div style={{display:"flex",flexDirection:"column",gap:16}}>
                 <div style={{...GLASS,padding:16}}>
-                  <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:12,fontWeight:600})}>Market Sentiment Trend (Line Graph)</div>
+                  <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:12,fontWeight:600})}>Live Market Sentiment Trend (Area Graph)</div>
                   <div style={{width:"100%",height:150}}>
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={[{time:"10:00",score:62},{time:"10:30",score:65},{time:"11:00",score:68},{time:"11:30",score:72},{time:"12:00",score:76}]}>
-                        <Line type="monotone" dataKey="score" stroke={PRIMARY_COLOR} strokeWidth={3} dot={{r:3,fill:"#fff"}} />
+                      <AreaChart data={lineData}>
+                        <defs>
+                          <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor={PRIMARY_COLOR} stopOpacity={0.8}/>
+                            <stop offset="95%" stopColor={PRIMARY_COLOR} stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <XAxis dataKey="time" tick={{fontSize:9,fill:"rgba(255,255,255,.3)"}} axisLine={false} tickLine={false} minTickGap={30} />
+                        <YAxis hide={true} domain={['dataMin - 5', 'dataMax + 5']} />
                         <Tooltip contentStyle={{background:"rgba(6,8,15,.9)",border:`1px solid ${PRIMARY_COLOR}40`,borderRadius:8}} itemStyle={{color:PRIMARY_COLOR}} />
-                      </LineChart>
+                        <Area type="monotone" dataKey="score" stroke={PRIMARY_COLOR} fillOpacity={1} fill="url(#colorScore)" strokeWidth={3} isAnimationActive={false} />
+                      </AreaChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
                 
                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
                   <div style={{...GLASS,padding:16}}>
-                    <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:12,fontWeight:600})}>Top Momentum (Bar Graph)</div>
+                    <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:12,fontWeight:600})}>Live Top Momentum (Bar Graph)</div>
                     <div style={{width:"100%",height:140}}>
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={[{name:"DOGE",val:91},{name:"PEPE",val:84},{name:"SHIB",val:78},{name:"WIF",val:72}]}>
+                        <BarChart data={coins.slice(0, 4).map(c => ({ name: c.ticker, val: c.score }))}>
                           <XAxis dataKey="name" tick={{fontSize:9,fill:"rgba(255,255,255,.5)"}} axisLine={false} tickLine={false} />
                           <Tooltip cursor={{fill:"rgba(255,0,144,.1)"}} contentStyle={{background:"rgba(6,8,15,.9)",border:`1px solid ${PRIMARY_COLOR}`,borderRadius:8}} />
-                          <Bar dataKey="val" fill={PRIMARY_COLOR} radius={[4,4,0,0]} />
+                          <Bar dataKey="val" fill={PRIMARY_COLOR} radius={[4,4,0,0]} isAnimationActive={true} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
                   
                   <div style={{...GLASS,padding:16}}>
-                    <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:12,fontWeight:600})}>Hype Distribution (Pie Chart)</div>
+                    <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:12,fontWeight:600})}>Live Hype Distribution (Pie Chart)</div>
                     <div style={{width:"100%",height:140}}>
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                          <Pie data={[{n:"Twitter",v:45},{n:"Reddit",v:28},{n:"Telegram",v:18},{n:"TikTok",v:9}]} dataKey="v" cx="50%" cy="50%" innerRadius={34} outerRadius={54} paddingAngle={4}>
+                          <Pie 
+                            data={[{n:"Twitter",v:platCounts[0]||45},{n:"Reddit",v:platCounts[1]||28},{n:"Telegram",v:platCounts[2]||18},{n:"TikTok",v:10}]} 
+                            dataKey="v" nameKey="n" cx="50%" cy="50%" innerRadius={34} outerRadius={54} paddingAngle={4}
+                            isAnimationActive={true}
+                          >
                             <Cell fill="#FF0090"/>
                             <Cell fill="#CC0073"/>
                             <Cell fill="#990056"/>
