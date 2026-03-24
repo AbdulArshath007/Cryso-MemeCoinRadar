@@ -611,7 +611,7 @@ function Dashboard({ user, onLogout }) {
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie 
-                            data={[{n:"Twitter",v:platCounts[0]||45},{n:"Reddit",v:platCounts[1]||28},{n:"Telegram",v:platCounts[2]||18},{n:"TikTok",v:10}]} 
+                            data={[{n:"Twitter",v:platCounts[0]||45},{n:"Reddit",v:platCounts[1]||28},{n:"Telegram",v:platCounts[2]||18},{n:"Instagram",v:10}]}
                             dataKey="v" nameKey="n" cx="50%" cy="50%" innerRadius={34} outerRadius={54} paddingAngle={4}
                             isAnimationActive={true}
                           >
