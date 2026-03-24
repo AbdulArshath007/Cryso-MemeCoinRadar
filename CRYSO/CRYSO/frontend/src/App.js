@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import Dither from "./components/Dither/Dither";
+import { ResponsiveContainer, LineChart, Line, BarChart, Bar, XAxis, Tooltip, PieChart, Pie, Cell } from 'recharts';
 
 const REACT_ENV_URL = process.env.REACT_APP_API_URL;
 const BASE_URL = REACT_ENV_URL ? (REACT_ENV_URL.endsWith('/') ? REACT_ENV_URL.slice(0, -1) : REACT_ENV_URL) : 'http://localhost:5000';
@@ -24,7 +25,7 @@ const GLOBAL_CSS = `
   @keyframes slideIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; } }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   @keyframes chatPopup {
-    0% { opacity: 0; transform: translateY(30px) scale(0.90); }
+    0% { opacity: 0; transform: translateY(-30px) scale(0.95); }
     100% { opacity: 1; transform: translateY(0) scale(1); }
   }
   @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
@@ -558,21 +559,49 @@ function Dashboard({ user, onLogout }) {
             )}
 
             {activeNav === "Deep-Dive" && (
-              <div>
-                <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:10}}>
-                  <span style={{color:PRIMARY_COLOR,fontSize:8}}>●</span>
-                  <span style={mulish({fontSize:11,color:PRIMARY_COLOR,fontWeight:600})}>Deep Dive Analysis</span>
+              <div style={{display:"flex",flexDirection:"column",gap:16}}>
+                <div style={{...GLASS,padding:16}}>
+                  <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:12,fontWeight:600})}>Market Sentiment Trend (Line Graph)</div>
+                  <div style={{width:"100%",height:150}}>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={[{time:"10:00",score:62},{time:"10:30",score:65},{time:"11:00",score:68},{time:"11:30",score:72},{time:"12:00",score:76}]}>
+                        <Line type="monotone" dataKey="score" stroke={PRIMARY_COLOR} strokeWidth={3} dot={{r:3,fill:"#fff"}} />
+                        <Tooltip contentStyle={{background:"rgba(6,8,15,.9)",border:`1px solid ${PRIMARY_COLOR}40`,borderRadius:8}} itemStyle={{color:PRIMARY_COLOR}} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
                 </div>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12}}>
-                  {[{coin:"DOGE",sentiment:"Bullish",momentum:85},{coin:"PEPE",sentiment:"Mixed",momentum:72},{coin:"SHIB",sentiment:"Neutral",momentum:58},{coin:"WIF",sentiment:"Bullish",momentum:79}].map(item => (
-                    <div key={item.coin} style={{...GLASS,padding:16}}>
-                      <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:8,fontWeight:600})}>{item.coin}</div>
-                      <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                        <div><div style={mono({fontSize:8,color:"rgba(255,255,255,.4)",marginBottom:4})}>Sentiment</div><div style={mulish({fontSize:12,color:"#fff",fontWeight:500})}>{item.sentiment}</div></div>
-                        <div><div style={mono({fontSize:8,color:"rgba(255,255,255,.4)",marginBottom:4})}>Momentum</div><div style={{width:"100%",height:4,background:"rgba(255,255,255,.06)",borderRadius:2}}><div style={{width:`${item.momentum}%`,height:"100%",background:PRIMARY_COLOR}}/></div></div>
-                      </div>
+                
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:16}}>
+                  <div style={{...GLASS,padding:16}}>
+                    <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:12,fontWeight:600})}>Top Momentum (Bar Graph)</div>
+                    <div style={{width:"100%",height:140}}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={[{name:"DOGE",val:91},{name:"PEPE",val:84},{name:"SHIB",val:78},{name:"WIF",val:72}]}>
+                          <XAxis dataKey="name" tick={{fontSize:9,fill:"rgba(255,255,255,.5)"}} axisLine={false} tickLine={false} />
+                          <Tooltip cursor={{fill:"rgba(255,0,144,.1)"}} contentStyle={{background:"rgba(6,8,15,.9)",border:`1px solid ${PRIMARY_COLOR}`,borderRadius:8}} />
+                          <Bar dataKey="val" fill={PRIMARY_COLOR} radius={[4,4,0,0]} />
+                        </BarChart>
+                      </ResponsiveContainer>
                     </div>
-                  ))}
+                  </div>
+                  
+                  <div style={{...GLASS,padding:16}}>
+                    <div style={mulish({fontSize:13,color:PRIMARY_COLOR,marginBottom:12,fontWeight:600})}>Hype Distribution (Pie Chart)</div>
+                    <div style={{width:"100%",height:140}}>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie data={[{n:"Twitter",v:45},{n:"Reddit",v:28},{n:"Telegram",v:18},{n:"TikTok",v:9}]} dataKey="v" cx="50%" cy="50%" innerRadius={34} outerRadius={54} paddingAngle={4}>
+                            <Cell fill="#FF0090"/>
+                            <Cell fill="#CC0073"/>
+                            <Cell fill="#990056"/>
+                            <Cell fill="#66003A"/>
+                          </Pie>
+                          <Tooltip contentStyle={{background:"rgba(6,8,15,.9)",border:`1px solid ${PRIMARY_COLOR}`,borderRadius:8}} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -628,7 +657,7 @@ function Dashboard({ user, onLogout }) {
 
       <div style={{position:"fixed",bottom:20,right:20,zIndex:50}}>
         {chatOpen && (
-          <div style={{...GLASS,width:320,height:420,borderRadius:14,display:"flex",flexDirection:"column",marginBottom:12, animation:"chatPopup 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s both"}}>
+          <div style={{...GLASS,width:320,height:420,borderRadius:14,display:"flex",flexDirection:"column",marginBottom:12, animation:"chatPopup 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards"}}>
             <div style={{padding:14,borderBottom:`1px solid ${PRIMARY_COLOR}19`,display:"flex",justifyContent:"space-between"}}>
               <div style={mulish({fontSize:14,color:"#fff",fontWeight:600})}>Crypto Assistant</div>
               <button onClick={() => setChatOpen(false)} style={{background:"none",border:"none",color:PRIMARY_COLOR,fontSize:16,cursor:"pointer"}}>×</button>
