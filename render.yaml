@@ -1,0 +1,37 @@
+services:
+  # Backend Node.js Service
+  - type: web
+    name: cryso-backend
+    env: node
+    rootDir: BACKEND
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: TELEGRAM_APP_ID
+        sync: false
+      - key: TELEGRAM_API_HASH
+        sync: false
+      - key: TELEGRAM_SESSION
+        sync: false
+      - key: REDDIT_API_KEY
+        sync: false
+
+  # Frontend React Static Site
+  - type: web
+    name: cryso-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    envVars:
+      - key: REACT_APP_API_URL
+        fromService:
+          type: web
+          name: cryso-backend
+          envVarKey: RENDER_EXTERNAL_URL
