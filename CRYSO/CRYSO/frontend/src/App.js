@@ -23,6 +23,10 @@ const GLOBAL_CSS = `
   @keyframes toastIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; } }
   @keyframes slideIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; } }
   @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes chatPopup {
+    0% { opacity: 0; transform: translateY(30px) scale(0.90); }
+    100% { opacity: 1; transform: translateY(0) scale(1); }
+  }
   @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
 `;
 
@@ -115,8 +119,8 @@ function LoadingScreen({ isVisible }) {
 }
 
 function LoginPage({ onLogin }) {
-  const [username, setUsername] = useState("arshawww");
-  const [password, setPassword] = useState("123456");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -179,7 +183,7 @@ function LoginPage({ onLogin }) {
               type="text" 
               value={username} 
               onChange={e => {setUsername(e.target.value); setError("");}} 
-              placeholder={isRegister ? "choose a username" : "arshawww"} 
+              placeholder={isRegister ? "choose a username" : "your username"} 
               disabled={loading} 
               style={{width:"100%",padding:"11px 13px",background:"rgba(255,0,144,.07)",border:`1px solid ${PRIMARY_COLOR}30`,borderRadius:8,color:"#fff",fontFamily:MULISH,fontSize:13,outline:"none",transition:"all .2s"}}
             />
@@ -245,10 +249,6 @@ function LoginPage({ onLogin }) {
           </button>
         </div>
 
-        <div style={mono({fontSize:10,color:"rgba(255,255,255,.3)",textAlign:"center",marginTop:20,borderTop:"1px solid rgba(255,255,255,.1)",paddingTop:16})}>
-          Demo Login:<br/>
-          <span style={{color:PRIMARY_COLOR,fontWeight:600}}>arshawww</span> / <span style={{color:PRIMARY_COLOR,fontWeight:600}}>123456</span>
-        </div>
       </div>
     </div>
   );
@@ -354,7 +354,6 @@ function Dashboard({ user, onLogout }) {
 
   const smartCryptoReply = useCallback((input) => {
     const q = input.toLowerCase();
-    if (q.match(/\b(hi|hello|hey|sup|what'?s up|greet)/)) return "Hey! 👋 I'm your Cryso crypto intelligence assistant. Ask me about trending coins, market sentiment, alerts, or anything crypto!";
     if (q.match(/\b(doge|dogecoin)\b/)) return "🐕 **Dogecoin (DOGE)** is currently BREAKOUT phase with a score of 91. It has 28.4K mentions in the last hour with a +12 delta. X and Reddit are buzzing — influencer with 2.1M followers just tweeted about it. High momentum play right now!";
     if (q.match(/\b(pepe)\b/)) return "🐸 **PEPE** is showing BREAKOUT signals (score: 84, +8 delta, 19.1K mentions), BUT our ML model flags a >74% **crash risk** probability. This is a CRITICAL alert — exercise extreme caution before entering. The hype may be manufactured.";
     if (q.match(/\b(shib|shiba)\b/)) return "🐶 **Shiba Inu (SHIB)** is in ACCUMULATION phase (score: 78, +5 delta, 15.3K mentions). Sentiment has flipped from 0.6 → 2.1 — a healthy accumulation signal. No immediate crash indicators, but watch DOGE for correlation.";
@@ -370,6 +369,10 @@ function Dashboard({ user, onLogout }) {
     if (q.match(/\b(twitter|reddit|telegram|platform)\b/)) return "📱 **Platform Breakdown (Live):**\n• Twitter (X): ~45% of volume — major driver\n• Reddit: ~28% — strong community activity\n• Telegram: ~18% — whale group signals\n• TikTok: ~9% — retail FOMO zone\n\nTwitter is the leading indicator. When Twitter moves first, price typically follows within 1-4 hours.";
     if (q.match(/\b(buy|should i buy|invest|entry)\b/)) return "💡 **Cryso is an intelligence tool, not financial advice.** That said, based on current signals:\n\n✅ Strong momentum: DOGE, WIF\n⚡ Early entry opportunity: NEIRO (watch for confirmation)\n⚠️ High risk/high reward: PEPE (but crash flag active)\n❌ Avoid: MOG, be cautious of BONK\n\nAlways DYOR and manage your risk!";
     if (q.match(/\b(help|what can you|features|commands)\b/)) return "🤖 **I can help you with:**\n• Coin analysis (ask about DOGE, PEPE, SHIB, WIF, etc.)\n• Market sentiment & overall mood\n• Active alerts & crash risk warnings\n• Platform breakdown (Twitter, Reddit, Telegram)\n• Buy/sell signals (not financial advice!)\n• Trending coins right now\n\nJust ask naturally — e.g. \"What's happening with DOGE?\" or \"Which coins should I avoid?\"";
+    
+    // Greeting check moved to the bottom so "Hi, what about DOGE?" isn't swallowed by the greeting response!
+    if (q.match(/^(hi|hello|hey|sup|what'?s up|greet)\b/)) return "Hey! 👋 I'm your Cryso crypto intelligence assistant. Ask me about trending coins, market sentiment, alerts, or anything crypto!";
+    
     const cryptoTerms = q.match(/\b(crypto|coin|token|blockchain|defi|nft|price|pump|dump)\b/);
     if (cryptoTerms) return "Great question about crypto! Based on current Cryso data, the market is in GREED mode (72/100) with 4 active breakouts. DOGE leads with 91/100 sentiment score. Want specific analysis on any coin? Just ask — DOGE, PEPE, SHIB, WIF, NEIRO, FLOKI, BONK, or MOG!";
     return "I'm your Cryso crypto intelligence assistant! I specialize in meme coin sentiment analysis. Try asking:\n• \"What's trending right now?\"\n• \"Tell me about DOGE\"\n• \"Which coins are crash risks?\"\n• \"What's the overall market sentiment?\"";
@@ -625,7 +628,7 @@ function Dashboard({ user, onLogout }) {
 
       <div style={{position:"fixed",bottom:20,right:20,zIndex:50}}>
         {chatOpen && (
-          <div style={{...GLASS,width:320,height:420,borderRadius:14,display:"flex",flexDirection:"column",marginBottom:12}}>
+          <div style={{...GLASS,width:320,height:420,borderRadius:14,display:"flex",flexDirection:"column",marginBottom:12, animation:"chatPopup 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.5s both"}}>
             <div style={{padding:14,borderBottom:`1px solid ${PRIMARY_COLOR}19`,display:"flex",justifyContent:"space-between"}}>
               <div style={mulish({fontSize:14,color:"#fff",fontWeight:600})}>Crypto Assistant</div>
               <button onClick={() => setChatOpen(false)} style={{background:"none",border:"none",color:PRIMARY_COLOR,fontSize:16,cursor:"pointer"}}>×</button>
