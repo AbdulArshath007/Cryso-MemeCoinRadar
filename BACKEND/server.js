@@ -172,6 +172,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date() });
 });
 
+app.get('/', (req, res) => {
+  res.send('<h1>Cryso API is running</h1><p>Frontend is available at <a href="https://cryso.onrender.com">cryso.onrender.com</a></p>');
+});
+
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
